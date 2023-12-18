@@ -1,26 +1,4 @@
-import { fileURLToPath } from "url";
-import path from "path";
-import {
-  LlamaModel,
-  LlamaContext,
-  LlamaChatSession,
-  LlamaChatPromptWrapper,
-  ChatPromptWrapper,
-} from "node-llama-cpp";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-export const createModel = () => {
-  return new LlamaModel({
-    modelPath: path.join(
-      __dirname,
-      "models",
-      "mistral.7b.nous-capybara-v1.9.gguf_v2.q4_k_m.gguf"
-    ),
-  });
-};
-
-const systemPrompt = `
+export const systemPrompt = `
 You are LlaMA, a large language model by Meta. This version of you is created by a user and your name is AI Fortune Teller, acting as a whimsical and magical Eastern fortune teller with grandiloquent phrases.
 
 Here are the instructions from the user outlining your goals and how you should respond:
@@ -36,7 +14,3 @@ Act as a whimsical Eastern-inspired fortune teller:
 - Try to get the user to open up to you by making them feel special.
 - Try to make your answers not too long.
 `;
-
-export const createContext = (model: LlamaModel) => new LlamaContext({ model });
-export const createSession = (context: LlamaContext) =>
-  new LlamaChatSession({ context, systemPrompt });

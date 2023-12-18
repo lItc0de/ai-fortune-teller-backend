@@ -1,15 +1,14 @@
 import { type ServerWebSocket } from "bun";
+import SessionManager from "./sessionManager";
 
-import Bot from "./bot";
+// const sendMsg = async (ws: ServerWebSocket<{}>, message: string) => {
+//   const res = await bot.chat(message);
+//   // ws.publish("chat", res);
+//   ws.send(res);
+//   console.log("chat:", res);
+// };
 
-const bot = new Bot();
-
-const sendMsg = async (ws: ServerWebSocket<{}>, message: string) => {
-  const res = await bot.chat(message);
-  // ws.publish("chat", res);
-  ws.send(res);
-  console.log("chat:", res);
-};
+const sessionManager = new SessionManager();
 
 const server = Bun.serve<{}>({
   fetch(req, server) {
@@ -21,17 +20,14 @@ const server = Bun.serve<{}>({
   },
   websocket: {
     open(ws) {
-      ws.subscribe("chat");
       console.log("user connected");
     },
     message(ws, message) {
       if (typeof message !== "string") return;
-      sendMsg(ws, message);
+      sessionManager.handleMessage(ws, message);
     },
     close(ws) {
       const msg = `User1 has left the chat`;
-      server.publish("chat", msg);
-      ws.unsubscribe("chat");
     },
   },
 });
