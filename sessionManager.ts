@@ -19,7 +19,6 @@ class SessionManager {
         break;
 
       case MessageType.OLD_SESSION:
-        await this.bot.newSession();
         if (message.userName) await this.bot.restartOldChat(message.userName);
         break;
 
@@ -29,6 +28,7 @@ class SessionManager {
         const answer = await this.bot.prompt(message.prompt);
         if (answer) {
           const newMessage = new Message(MessageType.BOT, answer);
+          console.log(newMessage);
           ws.send(newMessage.toJSON());
         }
         break;
