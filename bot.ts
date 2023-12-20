@@ -2,6 +2,7 @@ import {
   type LlamaModel,
   LlamaChatSession,
   type LlamaContext,
+  LLamaChatPromptOptions,
 } from "node-llama-cpp";
 import { createContext, createModel, createSession } from "./llama";
 import { systemPrompt } from "./prompts";
@@ -11,10 +12,19 @@ class Bot {
   context: LlamaContext;
   currentSession?: LlamaChatSession;
 
+  private chatPromptOptions: LLamaChatPromptOptions;
+
   constructor() {
     this.model = createModel();
     this.context = createContext(this.model);
     this.init();
+
+    this.chatPromptOptions = {
+      repeatPenalty: { penalty: 1.1, lastTokens: 128 },
+      temperature: 1,
+      topK: 35,
+      topP: 0.5,
+    };
   }
 
   async init() {
@@ -45,7 +55,7 @@ class Bot {
 
   async prompt(prompt: string) {
     console.log("Prompt:", prompt);
-    return await this.currentSession?.prompt(prompt);
+    return await this.currentSession?.prompt(prompt, this.chatPromptOptions);
   }
 
   async tellUserName(userName: string) {
