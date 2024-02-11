@@ -15,6 +15,7 @@
   "dependencies": {
     "@picovoice/cheetah-web": "^2.0.0",
     "@picovoice/web-voice-processor": "^4.0.8",
-    "node-llama-cpp": "^2.8.2"
+    "node-llama-cpp": "^2.8.2",
+    "openai": "^4.27.0"
   }
 }

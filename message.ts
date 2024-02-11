@@ -12,6 +12,8 @@ export interface RawMessage {
   userName?: string;
 }
 
+export type Prompt = {};
+
 class Message {
   type: MessageType;
   prompt?: string;
@@ -23,7 +25,7 @@ class Message {
     this.userName = userName;
   }
 
-  toJSON(): string {
+  toJSONString(): string {
     const rawMessage: RawMessage = {
       type: this.type,
       prompt: this.prompt,
@@ -32,9 +34,13 @@ class Message {
     return JSON.stringify(rawMessage);
   }
 
-  static createfromJSON(json: string) {
-    const { type, prompt, userName } = JSON.parse(json) as RawMessage;
+  static createfromJSON(rawMessage: RawMessage) {
+    const { type, prompt, userName } = rawMessage;
     return new Message(type, prompt, userName);
+  }
+
+  toPrompt(): Prompt {
+    return {};
   }
 }
 

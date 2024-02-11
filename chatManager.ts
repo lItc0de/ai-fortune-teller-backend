@@ -1,16 +1,16 @@
 import { type ServerWebSocket } from "bun";
-import Message, { MessageType } from "./message";
+import Message, { MessageType, RawMessage } from "./message";
 import Bot from "./bot";
 
-class SessionManager {
+class ChatManager {
   private bot: Bot;
 
   constructor() {
     this.bot = new Bot();
   }
 
-  async handleMessage(ws: ServerWebSocket<{}>, messageJSON: string) {
-    const message = Message.createfromJSON(messageJSON);
+  async handleMessage(rawMessage: RawMessage): Promise<string | undefined> {
+    const message = Message.createfromJSON(rawMessage);
     console.log(message);
 
     switch (message.type) {
@@ -27,9 +27,15 @@ class SessionManager {
 
         const answer = await this.bot.prompt(message.prompt);
         if (answer) {
-          const newMessage = new Message(MessageType.BOT, answer);
-          console.log(newMessage);
-          ws.send(newMessage.toJSON());
+          console.log("anser:", answer);
+          const response = {
+            answer,
+          };
+
+          // const newMessage = new Message(MessageType.BOT, answer);
+          // console.log(newMessage);
+          // return newMessage.toJSONString();
+          return JSON.stringify(response);
         }
         break;
 
@@ -42,4 +48,4 @@ class SessionManager {
   }
 }
 
-export default SessionManager;
+export default ChatManager;
