@@ -7,6 +7,7 @@
     "dev": "bun --hot run index.ts"
   },
   "devDependencies": {
+    "@edgedb/generate": "^0.4.1",
     "bun-types": "^1.0.15"
   },
   "peerDependencies": {
@@ -15,6 +16,7 @@
   "dependencies": {
     "@picovoice/cheetah-web": "^2.0.0",
     "@picovoice/web-voice-processor": "^4.0.8",
+    "edgedb": "^1.4.1",
     "node-llama-cpp": "^2.8.2",
     "openai": "^4.27.0"
   }
