@@ -68,6 +68,34 @@ class ChatManager {
     return content;
   }
 
+  async handleProfile(
+    serverMessageParams: ServerMessageParams
+  ): Promise<string | undefined> {
+    const message = new ServerMessage(serverMessageParams);
+    const prompt = message.toPrompt([]);
+    let content;
+    try {
+      const res = await fetch(URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(prompt),
+      });
+
+      if (!res || !res.body) return "";
+      const answer = (await res.json()) as {
+        choices: { message: { content: string } }[];
+      };
+      if (!answer) return "";
+      content = answer.choices[0].message.content;
+    } catch {
+      content = "You are an interesting person.";
+    }
+
+    return content;
+  }
+
   private async getMessagesHistory(userId: string): Promise<ServerMessage[]> {
     console.log("run query");
 

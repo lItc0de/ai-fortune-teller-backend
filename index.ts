@@ -67,6 +67,25 @@ const server = serve({
       });
     }
 
+    if (url.pathname === "/profile" && req.method === "POST") {
+      const message = await req.json();
+      if (typeof message !== "object")
+        return new Response("An error occured!", CORS_HEADERS);
+
+      const response = await chatManager.handleProfile(message);
+      if (!response) return new Response("An error occured!", CORS_HEADERS);
+      const answer = {
+        content: response,
+      };
+
+      return new Response(JSON.stringify(answer), {
+        headers: {
+          ...CORS_HEADERS.headers,
+          "Content-Type": "application/json",
+        },
+      });
+    }
+
     if (url.pathname === "/user") {
       // Create user
       if (req.method === "POST") {

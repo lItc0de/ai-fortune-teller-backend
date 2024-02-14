@@ -9,12 +9,12 @@ class TTS {
     // await spawnSync(PYTHON_PATH, [SCRIPT_PATH, text, audioPath, "en_0"]);
     // const result = process.stdout?.toString();
     const proc = Bun.spawn(
-      [PYTHON_PATH, SCRIPT_PATH, text, audioPath, "en_0"],
-      {
-        onExit(proc, exitCode, signalCode, error) {
-          console.log({ proc, exitCode, signalCode, error });
-        },
-      }
+      [PYTHON_PATH, SCRIPT_PATH, text, audioPath, "en_0"]
+      // {
+      //   onExit(proc, exitCode, signalCode, error) {
+      //     console.log({ proc, exitCode, signalCode, error });
+      //   },
+      // }
     );
 
     await proc.exited;
