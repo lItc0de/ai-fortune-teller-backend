@@ -1,20 +1,12 @@
-import { file, serve } from "bun";
+import { serve } from "bun";
 import TTS from "./tts";
 import ChatManager from "./chatManager";
-import UserManager from "./userManager";
+import UserManager, { User } from "./userManager";
 import e from "./dbschema/edgeql-js";
 
 const tts = new TTS();
 const userManager = new UserManager();
 const chatManager = new ChatManager(userManager);
-// let sessionManager: SessionManager;
-
-type User = {
-  id: string;
-  name?: string;
-  createdAt: number;
-  characterTraits: string[];
-};
 
 const CORS_HEADERS = {
   headers: {
@@ -38,14 +30,17 @@ const server = serve({
     if (url.pathname === "/") return new Response("Home page!", CORS_HEADERS);
 
     if (url.pathname === "/tts" && req.method === "POST") {
-      const data = await req.json();
-      const text = data?.text;
-
-      const audioPath = await tts.create(text);
-      if (!audioPath) return new Response("An error occured!", CORS_HEADERS);
-
-      const res = new Response(file(audioPath), CORS_HEADERS);
+      const res = new Response();
       return res;
+
+      // const data = await req.json();
+      // const text = data?.text;
+
+      // const audioPath = await tts.create(text);
+      // if (!audioPath) return new Response("An error occured!", CORS_HEADERS);
+
+      // const res = new Response(file(audioPath), CORS_HEADERS);
+      // return res;
     }
 
     if (url.pathname === "/chat" && req.method === "POST") {
@@ -91,16 +86,12 @@ const server = serve({
       if (req.method === "POST") {
         const user = (await req.json()) as User;
 
-        const query = e.insert(e.User, {
-          createdAt: e.datetime(new Date(user.createdAt).toISOString()),
-          characterTraits: [],
-          name: user.name,
-          id: user.id,
-          messages: null,
-        });
-        const res = await query.run(userManager.client);
-
-        if (!res) return new Response("An error occured!", CORS_HEADERS);
+        try {
+          await userManager.createUser(user);
+        } catch (error) {
+          console.log(error);
+          return new Response("An error occured!", CORS_HEADERS);
+        }
 
         return new Response("200", CORS_HEADERS);
       }
@@ -109,16 +100,11 @@ const server = serve({
       if (req.method === "PATCH") {
         const user = (await req.json()) as Partial<User> & { id: string };
 
-        const query = e.update(e.User, () => ({
-          filter_single: { id: user.id },
-          set: {
-            name: user.name,
-            characterTraits: user.characterTraits,
-          },
-        }));
-        const res = await query.run(userManager.client);
-
-        if (!res) return new Response("An error occured!", CORS_HEADERS);
+        try {
+          await userManager.updateUser(user);
+        } catch (error) {
+          return new Response("An error occured!", CORS_HEADERS);
+        }
 
         return new Response("200", CORS_HEADERS);
       }
@@ -157,3 +143,5 @@ const server = serve({
 });
 
 console.log(`Listening on ${server.hostname}:${server.port}`);
+
+// userManager.deleteAllUsersExcept([]);

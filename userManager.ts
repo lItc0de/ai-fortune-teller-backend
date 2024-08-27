@@ -2,12 +2,65 @@ import { type Client, createClient } from "edgedb";
 import e from "./dbschema/edgeql-js";
 import ServerMessage from "./serverMessage";
 
+export type User = {
+  id: string;
+  name?: string;
+  createdAt: number;
+  characterTraits: string[];
+};
+
 class UserManager {
   client: Client;
 
   constructor() {
     const baseClient = createClient();
     this.client = baseClient.withConfig({ allow_user_specified_id: true });
+  }
+
+  async createUser(user: User) {
+    const query = e.insert(e.User, {
+      createdAt: e.datetime(new Date(user.createdAt).toISOString()),
+      characterTraits: [],
+      name: user.name,
+      id: user.id,
+      messages: null,
+    });
+    const res = await query.run(this.client);
+
+    if (!res) throw new Error("User could not be created");
+  }
+
+  async updateUser(user: Partial<User> & { id: string }) {
+    const query = e.update(e.User, () => ({
+      filter_single: { id: user.id },
+      set: {
+        name: user.name,
+        characterTraits: user.characterTraits,
+      },
+    }));
+    const res = await query.run(this.client);
+
+    if (!res) throw new Error("User could not be updated");
+  }
+
+  async getOrCreateUser(userId: string, userName?: string) {
+    const query = e.select(e.User, () => ({
+      id: true,
+      filter_single: { id: userId },
+    }));
+
+    const result = await query.run(this.client);
+
+    if (result?.id !== userId) {
+      await this.createUser({
+        id: userId,
+        characterTraits: [],
+        createdAt: Date.now(),
+        name: userName,
+      });
+    }
+
+    return userId;
   }
 
   async getAllUsers() {

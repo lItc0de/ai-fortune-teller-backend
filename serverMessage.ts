@@ -9,11 +9,10 @@ export enum Topic {
   QUESTION,
 }
 
-export type RoleType = "user" | "system" | "assistant";
+export type RoleType = "user" | "assistant";
 
 export enum Role {
   user,
-  system,
   assistant,
 }
 
@@ -24,6 +23,7 @@ export type ServerMessageParams = Omit<
 
 class ServerMessage {
   userId: string;
+  userName?: string;
   role: Role;
   content: string;
   topic: Topic;
@@ -33,6 +33,7 @@ class ServerMessage {
     this.role = params.role;
     this.content = params.content;
     this.topic = params.topic;
+    this.userName = params.userName;
   }
 
   toJSONString(): string {
@@ -41,6 +42,7 @@ class ServerMessage {
       role: this.role,
       content: this.content,
       topic: this.topic,
+      userName: this.userName,
     });
   }
 
@@ -56,7 +58,7 @@ class ServerMessage {
   }
 
   toMessage() {
-    return { role: Role[this.role], content: this.content };
+    return { role: Role[this.role] as RoleType, content: this.content };
   }
 
   toPrompt(messagesHistory: ServerMessage[]) {

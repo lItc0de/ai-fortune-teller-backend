@@ -1,5 +1,5 @@
 module default {
-  scalar type Role extending enum<user, system, assistant>;
+  scalar type Role extending enum<user, assistant>;
   scalar type Topic extending enum<LOVE, CAREER, GENERAL, QUESTION>;
 
   type User {

@@ -5,8 +5,10 @@ import ServerMessage, {
 } from "./serverMessage";
 import UserManager from "./userManager";
 import e from "./dbschema/edgeql-js";
+import ClaudeBot from "./claude";
 
 const URL = process.env.OPENAI_BASE_URL || "";
+const claudeBot = new ClaudeBot();
 
 class ChatManager {
   private userManager: UserManager;
@@ -21,6 +23,13 @@ class ChatManager {
     const message = new ServerMessage(serverMessageParams);
 
     if (message.role === Role.assistant) return;
+    const userId = await this.userManager.getOrCreateUser(
+      message.userId,
+      message.userName
+    );
+
+    if (!userId) return;
+
     const messagesHistory = await this.getMessagesHistory(message.userId);
 
     await this.userManager.addMessageToHistory(
@@ -35,37 +44,29 @@ class ChatManager {
 
     const prompt = message.toPrompt(messagesHistory);
 
-    console.log(prompt);
+    const answer = await claudeBot.chat(
+      prompt.messages,
+      message.userId,
+      message.topic
+    );
 
-    // return "Hello back";
-
-    const res = await fetch(URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(prompt),
-    });
-
-    if (!res || !res.body) return "";
-
-    const answer = (await res.json()) as {
-      choices: { message: { content: string } }[];
-    };
     if (!answer) return "";
-    const content = answer.choices[0].message.content;
+    const content = answer.content[0];
+    if (content.type !== "text") return;
+
+    const text = content.text;
 
     await this.userManager.addMessageToHistory(
       message.userId,
       new ServerMessage({
-        content,
+        content: text,
         role: Role.assistant,
         topic: message.topic,
         userId: message.userId,
       })
     );
 
-    return content;
+    return text;
   }
 
   async handleProfile(
@@ -73,32 +74,22 @@ class ChatManager {
   ): Promise<string | undefined> {
     const message = new ServerMessage(serverMessageParams);
     const prompt = message.toPrompt([]);
-    let content;
-    try {
-      const res = await fetch(URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(prompt),
-      });
+    let text = "You are an interesting person.";
 
-      if (!res || !res.body) return "";
-      const answer = (await res.json()) as {
-        choices: { message: { content: string } }[];
-      };
-      if (!answer) return "";
-      content = answer.choices[0].message.content;
-    } catch {
-      content = "You are an interesting person.";
-    }
+    const answer = await claudeBot.chat(
+      prompt.messages,
+      message.userId,
+      message.topic
+    );
 
-    return content;
+    if (!answer) return "";
+    const content = answer.content[0];
+    if (content.type === "text") text = content.text;
+
+    return text;
   }
 
   private async getMessagesHistory(userId: string): Promise<ServerMessage[]> {
-    console.log("run query");
-
     const query = e.select(e.User, () => ({
       filter_single: { id: userId },
       name: true,
@@ -112,7 +103,6 @@ class ChatManager {
     }));
 
     const user = await query.run(this.userManager.client);
-    console.log("User", user);
     if (!user) return [];
 
     const systemMessages = [
@@ -121,6 +111,12 @@ class ChatManager {
         role: Role.user,
         topic: Topic.GENERAL,
         content: `My name is ${user.name}.`,
+      }),
+      new ServerMessage({
+        userId,
+        role: Role.assistant,
+        topic: Topic.GENERAL,
+        content: `Hello ${user.name}.`,
       }),
     ];
 
@@ -133,6 +129,15 @@ class ChatManager {
           content: `I have the following character traits: ${user.characterTraits.join(
             ", "
           )}. Use them to give me more precise answers.`,
+        })
+      );
+
+      systemMessages.push(
+        new ServerMessage({
+          userId,
+          role: Role.assistant,
+          topic: Topic.GENERAL,
+          content: `I will do.`,
         })
       );
     }

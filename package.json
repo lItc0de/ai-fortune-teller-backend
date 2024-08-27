@@ -14,6 +14,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.27.0",
     "@picovoice/cheetah-web": "^2.0.0",
     "@picovoice/web-voice-processor": "^4.0.8",
     "edgedb": "^1.4.1",
