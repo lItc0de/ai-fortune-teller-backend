@@ -178,5 +178,6 @@ dist
 models
 tts_audios
 
+dbschema/edgeql-j
 characters
 FortuneTellerInstructionTemplate.yaml
