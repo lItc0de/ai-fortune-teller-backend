@@ -27,6 +27,7 @@ RUN bun install --ci
 # Copy application code
 COPY --link . .
 
+RUN bunx @edgedb/generate edgeql-js
 
 # Final stage for app image
 FROM base
