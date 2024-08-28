@@ -6,6 +6,9 @@
 app = 'ai-fortune-teller-backend'
 primary_region = 'ams'
 
+[env]
+  PORT = "3000"
+
 [build]
 
 [http_service]

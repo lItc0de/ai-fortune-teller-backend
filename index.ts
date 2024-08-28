@@ -2,7 +2,6 @@ import { serve } from "bun";
 import TTS from "./tts";
 import ChatManager from "./chatManager";
 import UserManager, { User } from "./userManager";
-import e from "./dbschema/edgeql-js";
 
 const tts = new TTS();
 const userManager = new UserManager();
@@ -16,6 +15,8 @@ const CORS_HEADERS = {
       "Origin, X-Requested-With, Content-Type, Accept",
   },
 };
+
+const port = process.env.PORT || 3000;
 
 const server = serve({
   async fetch(req) {
@@ -140,8 +141,7 @@ const server = serve({
 
     return new Response("404!", CORS_HEADERS);
   },
-  hostname: "0.0.0.0",
-  port: "3000",
+  port,
 });
 
 console.log(`Listening on ${server.hostname}:${server.port}`);
