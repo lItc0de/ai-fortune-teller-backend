@@ -4,8 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "bun run index.ts",
-    "dev": "bun --hot run index.ts",
-    "prebuild": "bunx @edgedb/generate edgeql-js"
+    "dev": "bun --hot run index.ts"
   },
   "devDependencies": {
     "@edgedb/generate": "^0.5.5",
