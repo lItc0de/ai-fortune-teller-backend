@@ -140,6 +140,8 @@ const server = serve({
 
     return new Response("404!", CORS_HEADERS);
   },
+  hostname: "0.0.0.0",
+  port: "3000",
 });
 
 console.log(`Listening on ${server.hostname}:${server.port}`);

@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "@edgedb/generate": "^0.4.1",
+    "@flydotio/dockerfile": "latest",
     "bun-types": "^1.0.15"
   },
   "peerDependencies": {
