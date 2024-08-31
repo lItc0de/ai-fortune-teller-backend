@@ -9,7 +9,8 @@ const chatManager = new ChatManager(userManager);
 
 const CORS_HEADERS = {
   headers: {
-    "Access-Control-Allow-Origin": "http://localhost:5173",
+    "Access-Control-Allow-Origin":
+      process.env.FRONTEND_URL || "http://localhost:8080",
     "Access-Control-Allow-Methods": "OPTIONS, POST, GET, PATCH, DELETE",
     "Access-Control-Allow-Headers":
       "Origin, X-Requested-With, Content-Type, Accept",
