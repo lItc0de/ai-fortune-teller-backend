@@ -20,6 +20,6 @@
     "@picovoice/web-voice-processor": "^4.0.8",
     "edgedb": "^1.4.1",
     "node-llama-cpp": "^2.8.2",
-    "openai": "^4.27.0"
+    "openai": "^4.57.0"
   }
 }

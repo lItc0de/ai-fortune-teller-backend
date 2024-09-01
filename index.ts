@@ -1,7 +1,7 @@
-import { serve } from "bun";
-import TTS from "./tts";
+import { file, serve } from "bun";
 import ChatManager from "./chatManager";
 import UserManager, { User } from "./userManager";
+import TTS from "./tts-openai";
 
 const tts = new TTS();
 const userManager = new UserManager();
@@ -32,17 +32,17 @@ const server = serve({
     if (url.pathname === "/") return new Response("Home page!", CORS_HEADERS);
 
     if (url.pathname === "/tts" && req.method === "POST") {
-      const res = new Response();
-      return res;
-
-      // const data = await req.json();
-      // const text = data?.text;
-
-      // const audioPath = await tts.create(text);
-      // if (!audioPath) return new Response("An error occured!", CORS_HEADERS);
-
-      // const res = new Response(file(audioPath), CORS_HEADERS);
+      // const res = new Response();
       // return res;
+
+      const data = await req.json();
+      const text = data?.text;
+
+      const audioPath = await tts.create(text);
+      if (!audioPath) return new Response("An error occured!", CORS_HEADERS);
+
+      const res = new Response(file(audioPath), CORS_HEADERS);
+      return res;
     }
 
     if (url.pathname === "/chat" && req.method === "POST") {
