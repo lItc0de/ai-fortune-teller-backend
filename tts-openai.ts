@@ -1,4 +1,4 @@
-import fs from "fs";
+// import fs from "fs";
 import OpenAI from "openai";
 
 class TTS {
@@ -8,9 +8,9 @@ class TTS {
     this.openai = new OpenAI();
   }
 
-  create = async (text?: string): Promise<string> => {
-    const audioPath = `tts_audios/audio.mp3`;
-    if (!text) return "";
+  create = async (text?: string): Promise<Buffer | undefined> => {
+    // const audioPath = `tts_audios/audio.mp3`;
+    if (!text) return;
 
     const mp3 = await this.openai.audio.speech.create({
       model: "tts-1",
@@ -19,9 +19,9 @@ class TTS {
       speed: 1.2,
     });
 
-    const buffer = Buffer.from(await mp3.arrayBuffer());
-    await fs.promises.writeFile(audioPath, buffer);
-    return audioPath;
+    const audioBuffer = Buffer.from(await mp3.arrayBuffer());
+    // await fs.promises.writeFile(audioPath, buffer);
+    return audioBuffer;
   };
 }
 

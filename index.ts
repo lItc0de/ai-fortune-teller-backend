@@ -38,10 +38,10 @@ const server = serve({
       const data = await req.json();
       const text = data?.text;
 
-      const audioPath = await tts.create(text);
-      if (!audioPath) return new Response("An error occured!", CORS_HEADERS);
+      const audioBuffer = await tts.create(text);
+      if (!audioBuffer) return new Response("An error occured!", CORS_HEADERS);
 
-      const res = new Response(file(audioPath), CORS_HEADERS);
+      const res = new Response(audioBuffer, CORS_HEADERS);
       return res;
     }
 
